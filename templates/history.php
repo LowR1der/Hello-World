@@ -1,0 +1,31 @@
+<?php
+
+    // configuration
+    require("../includes/config.php"); 
+    // render portfolio
+    
+    $positions =[];
+    $rows = query ("SELECT symbol, shares FROM DB_Shares WHERE id=?", $_SESSION["id"]);
+    $cash = query ("SELECT cash FROM users WHERE id=?", $_SESSION["id"]);
+    
+    
+	foreach ($rows as $row)
+	{
+		$stock = lookup($row["symbol"]);
+		$stock["price"] = number_format ($stock["price"],2,'.',' ');	
+		
+		
+		if ($stock !== false) 
+		{
+			
+			$total ["total"] = $stock["price"]*$row["shares"];
+			$total["total"] = number_format ($total["total"],2,'.',' ');
+			
+			$positions [] =	["name" => $stock["name"], "price" => $stock["price"], "shares" => $row["shares"], "symbol" => $row["symbol"], "total" => $total["total"]];
+		} 	
+		
+	
+	}
+    render("portfolio.php", ["positions" => $positions, "title" => "Portfolio", "cash" =>$cash[0]["cash"]]);
+
+?>
